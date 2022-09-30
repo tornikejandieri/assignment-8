@@ -6,10 +6,10 @@
     <div>Available Funds: {{ availableFunds }}</div>
     <div>Total Expenses: {{ currentExpenses }}</div>
     <hr />
-    <div>Funds left: {{ remainingFunds }}</div>
+    <div>Funds left: {{ computedFunds }}</div>
   </section>
   <section>
-    <form @submit.prevent="addExpense">
+    <form @submit.prevent="add">
       <div>
         <label for="amount">Amount</label>
         <input id="amount" type="number" v-model="enteredExpense" />
@@ -20,30 +20,59 @@
 </template>
 
 <script>
+import { ref, computed, watch } from 'vue';
 export default {
-  data() {
-    return {
-      availableFunds: 100,
-      currentExpenses: 0,
-      enteredExpense: 0,
+  // data() {
+  //   return {
+  //     availableFunds: 100,
+  //     currentExpenses: 0,
+  //     enteredExpense: 0,
+  //   };
+  // },
+  // computed: {
+  //   remainingFunds() {
+  //     return this.availableFunds - this.currentExpenses;
+  //   },
+  // },
+  // methods: {
+  //   addExpense() {
+  //     this.currentExpenses += this.enteredExpense;
+  //   },
+  // },
+  // watch: {
+  //   remainingFunds(val) {
+  //     if (val < 0) {
+  //       alert('You are broke!');
+  //     }
+  //   },
+  // },
+  setup() {
+    const availableFunds = 100;
+    const currentExpenses = ref(0);
+    const enteredExpense = ref(0);
+
+    const computedFunds = computed(() => {
+      return availableFunds - currentExpenses.value;
+    });
+
+    const add = () => {
+      currentExpenses.value += enteredExpense.value;
+      enteredExpense.value = '';
     };
-  },
-  computed: {
-    remainingFunds() {
-      return this.availableFunds - this.currentExpenses;
-    },
-  },
-  methods: {
-    addExpense() {
-      this.currentExpenses += this.enteredExpense;
-    },
-  },
-  watch: {
-    remainingFunds(val) {
+
+    watch(computedFunds, (val) => {
       if (val < 0) {
-        alert('You are broke!');
+        alert('no funds left');
       }
-    },
+    });
+
+    return {
+      availableFunds,
+      currentExpenses,
+      add,
+      computedFunds,
+      enteredExpense,
+    };
   },
 };
 </script>
